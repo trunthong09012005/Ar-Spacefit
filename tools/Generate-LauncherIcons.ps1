@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
 $workspaceRoot = Split-Path -Parent $PSScriptRoot
-$resourceRoot = Join-Path $workspaceRoot 'app\src\main\res'
+$resourceRoot = Join-Path $workspaceRoot 'apps\android\src\main\res'
 $sourceImage = [System.Drawing.Image]::FromFile((Resolve-Path -LiteralPath $SourcePath))
 
 $densitySizes = [ordered]@{
