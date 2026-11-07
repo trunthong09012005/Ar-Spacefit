@@ -2,6 +2,8 @@
 
 ## Cổng chất lượng
 
+CI nền trên GitHub được mô tả trong [CI/CD](CI_CD.md): core/HTTP trên Windows và Android JVM/lint/build. CI này chưa chạy native/thiết bị, không thay thế cổng nghiệm thu đầy đủ bên dưới.
+
 Mã kiểm thử tập trung trong [test/](../test/README.md): `test/backend/`, `test/android/unit/`, `test/android/instrumentation/`. Root `pytest.ini` khai báo discovery/Python path; Gradle `:app` ánh xạ hai source set sang thư mục chung. Chạy lệnh từ gốc repo. Output APK/JUnit vẫn dưới `apps/android/build/`, evidence QA vẫn `.tools/qa/`.
 
 `AGENTS.md` yêu cầu test và cập nhật bằng chứng cho mọi thay đổi mã sau này. Test tự động không thay thế quét đồ/AR thật. Không tuyên bố “hoàn hảo” hoặc “100%” theo số test.

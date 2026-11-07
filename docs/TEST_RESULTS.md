@@ -1,5 +1,14 @@
 # Kết quả kiểm thử AR-SpaceFit
 
+## 07/11/2026 — CI nền và APK artifact
+
+- Workflow Windows backend/Android và gate tổng hợp; giới hạn CI nền: không chạy Blender, COLMAP/OpenMVS thật hoặc UI/AR trên thiết bị. Ba nhóm native được loại công khai khỏi command backend, không đánh dấu là đã pass. Chưa chạy trên GitHub; cần push nhánh và kiểm run thật. Không triển khai backend/release theo lựa chọn người dùng.
+- Regression report gate: trước helper, pytest **1 fail/7 pass** đúng ca report hợp lệ cần được chấp nhận; các ca âm trả nonzero vì script chưa có, chưa chứng minh xử lý âm. Sau helper: 8 ca đều đạt, gồm thiếu report, XML lỗi, không có suite, 0 test, failure, error, skip và report hợp lệ. Chạy kèm local-doc links: **31 pass/0 fail/error/skip** (23 tài liệu + 8 ca), JUnit `.tools/qa/ci-20261107/targeted.xml`; RED log/XML cùng thư mục.
+- actionlint **v1.7.12** exit 0 cho `.github/workflows/ci.yml`; binary ZIP upstream SHA-256 `6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9` khớp trước giải nén/chạy. Actionlint log cùng QA; kiểm thêm YAML BaseLoader, SHA pin 40 ký tự, quyền read-only, needs/always gate và parse các block PowerShell. Không chạy script download tùy ý hoặc cài tool toàn máy.
+- Lệnh Test-All: JDK 25.0.2, Blender, Offline, RequireBlender/RequireDevice/RequireDocker/RequireColmapDocker; evidence `.tools/qa/run-20261107-160953-04219f70/`. Core **421 pass**, HTTP **4 pass**, Blender **4 pass**, Android JVM **117 pass**, build/lint/debug APK và instrumentation APK thành công. COLMAP **11 fail**, OpenMVS **1 pass/15 fail**, UI **chưa chạy** (không có QA emulator được chọn). Tổng gate **exit 1**. Doctor/scan thật/AR chưa nghiệm thu.
+- Probe Docker read-only đúng desktop-linux với quyền runtime xác nhận pipe `dockerDesktopLinuxEngine` không tồn tại; lưu `docker-readiness.log`. Probe sandbox ban đầu không đủ quyền đọc metadata context, không dùng lỗi đó để kết luận daemon. Không restart Docker/WSL, đọc DB/token, chạy lại job thật hoặc cài app.
+- APK local SHA-256 `D8E9754DE3987825DA0AF2A78E2483F8BECA4C960F4151819653BD9339AA876D`; không phải artifact do GitHub build. Không suy ra chữ ký cập nhật điện thoại hoặc chất lượng quét thật từ APK build thành công.
+
 ## 07/11/2026 — chia commit và nhánh Gitflow
 
 - Git CLI có sẵn; extension `git flow` chưa cài và không cần để dùng mô hình nhánh. Tạo develop/feature, commit Conventional Commits tiếng Anh và tích hợp `--no-ff` bằng worktree local riêng; main giữ nguyên. Chỉ thao tác Git local, không push/tag/release hoặc thay chính sách GitHub.

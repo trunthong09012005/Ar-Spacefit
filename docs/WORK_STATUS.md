@@ -2,6 +2,14 @@
 
 Cập nhật 07/11/2026. Đọc cùng `TEST_RESULTS.md`; trạng thái cũ không thay thế kiểm tra runtime mới.
 
+## CI GitHub Actions và APK tải về — 07/11/2026
+
+- Theo lựa chọn người dùng, phạm vi hiện tại là kiểm thử/build APK debug để tải, chưa deploy backend hoặc phát hành release. Triển khai trên `feature/ci-pipeline` từ develop, theo quy tắc commit tiếng Anh; chưa push, tạo PR, bật branch protection hoặc có kết quả Actions remote. Hướng dẫn thao tác GitHub và lệnh push nằm trong [CI/CD](CI_CD.md).
+- `.github/workflows/ci.yml`: push nhánh Gitflow/PR vào nhánh tích hợp và workflow_dispatch; Windows backend core/HTTP, Windows Android JVM/lint/build, check tổng hợp `CI gate`. Pin action bằng SHA upstream đã xác minh, token read-only, không dùng secret thật; report/APK artifact giữ 7 ngày. APK dùng debug key runner, chưa phải release ký chính thức.
+- Thêm `tools/Assert-JUnit.ps1` và 8 regression trong `test/backend/test_junit_report.py`: report thiếu/rỗng/lỗi/skip không được tính PASS. RED **1 fail/7 pass** khi chưa có helper, GREEN cùng kiểm tài liệu **31 pass**; actionlint **1.7.12** đạt, YAML/pin/dependency và cú pháp PowerShell đạt. Tool QA được tải riêng và đối chiếu SHA-256 upstream.
+- Gate mới `.tools/qa/run-20261107-160953-04219f70/`: core **421 pass**, HTTP **4 pass**, Blender **4 pass**, Android **117 pass**, build/lint/APK thành công. COLMAP **11 fail**, OpenMVS **1 pass/15 fail**; Docker server probe xác nhận pipe Engine không tồn tại. UI chưa chạy vì không chọn QA emulator. Gate exit 1, native doctor/scan/AR chưa nghiệm thu. CI nền loại ba file native rõ ràng, không thay thế gate đầy đủ hoặc che lỗi môi trường local.
+- Evidence workflow/RED/GREEN/actionlint/probe ở `.tools/qa/ci-20261107/`. Không thay mã ứng dụng/backend, dữ liệu hoặc dịch vụ; không cài app lên điện thoại. Việc tiếp theo: push nhánh CI và develop lên remote, mở PR, đọc lần chạy Actions đầu; chỉ bật required check sau khi xác nhận tên check và quyền repository thực tế.
+
 ## Gitflow và nhập baseline theo thành phần — 07/11/2026
 
 - Người dùng cho phép tự tạo nhánh và tự commit bằng tiếng Anh. Giữ nguyên `main` tại commit ban đầu `83d363b`; tạo `develop` và sáu `feature/*` theo [Gitflow](GITFLOW.md). Mỗi feature tiếp theo lấy mốc develop đã merge phần trước; dùng merge `--no-ff` trong worktree tích hợp QA riêng để giữ nguyên phần việc còn chưa commit ở worktree chính. Không tạo release/tag vì sản phẩm chưa nghiệm thu; không push hoặc thay protection GitHub.
