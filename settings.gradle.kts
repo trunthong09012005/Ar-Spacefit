@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 rootProject.name = "AR SpaceFit"
 
 include(":app")
+project(":app").projectDir = file("apps/android")

@@ -1,108 +1,57 @@
-# SpaceFit AR
+# AR-SpaceFit
 
-**Ứng dụng hỗ trợ bố trí nội thất bằng nhận diện đa góc nhìn và mô hình 3D tham số.**
+Ứng dụng Android quét nội thất thật, dựng mô hình 3D trên laptop, lưu GLB và hỗ trợ bố trí trong phòng.
 
-## Mục tiêu đồ án
+## Bắt đầu
 
-SpaceFit AR giúp người dùng kiểm tra một món nội thất có phù hợp với căn phòng trước khi mua:
+- [Cấu trúc repository và quy trình phát triển](docs/REPOSITORY_STRUCTURE.md)
+- [Hướng dẫn đóng góp](CONTRIBUTING.md)
+- [Skill bắt buộc theo phạm vi dự án](docs/SKILLS.md)
+- [Mục lục tài liệu](docs/README.md)
+- [Hướng dẫn chạy và nghiệm thu](docs/RUNBOOK.md)
+- [Backend: cài công cụ, ghép nối và API](backend/README.md)
+- [Kiến trúc, dữ liệu và thuật toán](docs/ARCHITECTURE.md)
+- [Báo cáo kỹ thuật và kịch bản demo](docs/reports/BAO_CAO_KY_THUAT.md)
+- [Nội dung 12 slide thuyết trình](docs/reports/SLIDE_CONTENT.md)
+- [Kết quả kiểm thử và phần còn cần nghiệm thu](docs/TEST_RESULTS.md)
+- [Quy tắc làm việc cho những lần sửa sau](AGENTS.md)
+- [Chạy unit/integration/black-box và checklist nghiệm thu](docs/TESTING.md)
+- [Thư mục test tập trung](test/README.md)
+- [Việc đang làm và còn dang dở](docs/WORK_STATUS.md)
 
-1. Nhấn bắt đầu quét; ML Kit tìm vật thể nổi bật và khung theo dõi tự bám sát vật thể thay vì dùng khung cố định.
-2. Quét đủ năm hướng của cùng một món nội thất: tổng thể, trái, phải, trên và dưới. Ảnh được cắt gần theo vùng vật thể đã khóa.
-3. Gemini đối chiếu cả năm ảnh để nhận diện loại đồ, màu sắc, vật liệu và đề xuất thông tin ban đầu.
-4. Xem mô hình đại diện, kéo để xoay 360°, sửa loại đồ, màu và hình dáng tham số. Đo và xác nhận lại kích thước phủ bì.
-5. Lưu mô hình đã chỉnh vào kho hoặc đặt ngay vào phòng 3D; có thể mở “Chỉnh 3D” trong kho để sửa tiếp.
-6. SpaceFit Engine kiểm tra ranh giới, va chạm, khoảng trống và diện tích chiếm dụng.
-7. Ứng dụng hiển thị SpaceFit Score cùng cảnh báo có thể giải thích được.
+## Chức năng đã triển khai trong mã
 
-## Phạm vi chính
+- Kotlin / Jetpack Compose / CameraX / Room Database v4.
+- Furniture Scanner: chụp tay hoặc tự chụp 1,5 giây; nhập bộ ảnh JPEG/PNG hoặc video MP4; lịch sử phiên lưu cục bộ.
+- Kiểm tra ảnh mờ, cảnh báo vật thể chạm mép qua ML Kit, hướng dẫn ba vòng chụp.
+- Backend FastAPI có upload, job bền vững, progress, lỗi, cancel/retry, tải artifact.
+- Pipeline OpenCV → COLMAP → OpenMVS → Blender → preview GLB → người dùng xác nhận crop/hướng/scale → GLB đơn vị mét.
+- Xem GLB có texture bằng SceneView/Filament, xoay/zoom, số polygon; lưu My Furniture và dùng lại ngoại tuyến.
+- Phòng 3D và mặt bằng có di chuyển, xoay, nhân bản, snap tường; lưu nhiều project.
+- Đo phòng chữ nhật từ ba điểm sàn bằng ARCore; nhập chiều cao và đánh dấu cửa bằng tay.
+- SpaceFit kiểm tra polygon xoay, chiều cao, khoảng cách đồ/tường, vùng cửa; tìm đồ vừa vùng chọn.
+- Gợi ý bố trí theo quy tắc, giữ đồ khóa, chỉ trả phương án đủ đồ và hợp lệ.
+- AR Preview neo thiết kế lên sàn, chỉnh hướng/dịch chuyển; Before/After và xuất PNG.
+- Luồng nhận diện Gemini 5 góc và mô hình tham số cũ được giữ như lựa chọn riêng.
 
-- Sáu nhóm nội thất: sofa, ghế, bàn, giường, tủ và đèn.
-- CameraX kết hợp ML Kit Object Detection để phát hiện và theo dõi vật thể thời gian thực.
-- Quy trình bắt buộc năm hướng: tổng thể, trái, phải, trên và dưới.
-- Nhận diện đa ảnh bằng Gemini; chỉ phân tích sau khi đã có đủ năm hướng.
-- Xem trước 3D tương tác và sửa tên, loại đồ, màu, chất liệu, kích thước. Giữ phần thập phân, hỗ trợ dấu phẩy khi nhập cm.
-- Ghế/sofa: chỉnh tỷ lệ cao mặt ngồi và tay vịn. Bàn: chỉnh độ dày mặt. Tủ: chỉnh 1–4 cánh. Các loại khác dùng hình dáng cơ bản.
-- Mọi mô hình được chuẩn hóa theo kích thước phủ bì trước khi đặt vào phòng, để phần hiển thị thống nhất với hình học kiểm tra độ vừa.
-- Nếu AI thiếu số đo, để trống cho người dùng nhập; không điền kích thước hay chất liệu giả. Kết quả chưa xác nhận cùng một món nội thất bị từ chối.
-- Kho nội thất cục bộ bằng Room Database.
-- Phòng có chiều rộng/chiều sâu chỉnh được.
-- Đặt, di chuyển, xoay và đổi tỷ lệ vật thể.
-- Phát hiện vật thể ra ngoài phòng hoặc va chạm với vật thể khác.
-- SpaceFit Score được tính cục bộ và có unit test.
+## Chạy Android
 
-Thử quần áo, dựng lại mô hình 3D chính xác từ một ảnh và tự động thu thập dữ liệu website không thuộc phạm vi đồ án chính.
-
-Đồ án không cần tự huấn luyện mô hình. Gemini đảm nhiệm nhận diện ảnh và gợi ý tham số; ứng dụng dựng mesh từ tham số đã xác nhận. Chỉ cần tự chụp một tập đồ thật nhỏ để đánh giá, không phải bộ dữ liệu train. Hai phần có thể trình bày rõ trong đồ án là quy trình chỉnh mô hình có người xác nhận và `SpaceFitEngine` có quy tắc hình học xác định, giải thích được, có kiểm thử.
-
-Ứng dụng không nạp sẵn nội thất giả: kho và phòng 3D bắt đầu trống. Chỉ dữ liệu do người dùng quét hoặc tự nhập mới được lưu vào Room Database.
-
-## SpaceFit Score
-
-Điểm được tính xác định trong ứng dụng, không do AI tự tạo:
-
-- 40 điểm: vật thể nằm hoàn toàn trong phòng.
-- 25 điểm: đáp ứng khoảng cách khuyến nghị 60 cm.
-- 20 điểm: không va chạm vật thể khác.
-- 15 điểm: tỷ lệ chiếm diện tích hợp lý.
-
-Gemini được dùng để hiểu ảnh và tạo lời khuyên. Các kết luận hình học luôn do `SpaceFitEngine` tính toán.
-
-## Cấu trúc Android chính
-
-```text
-app/src/main/java/com/example/
-├── ai/          # Nhận diện ảnh bằng Gemini
-├── ar/          # Viewport và mô hình hình học 3D
-├── camera/      # CameraX
-├── data/        # Room Database và kho nội thất
-├── spacefit/    # Luật không gian và SpaceFit Score
-└── ui/          # Scanner, kho nội thất và màn hình hỗ trợ
-```
-
-Repository hiện là dự án Android thuần Kotlin/Jetpack Compose; mã nguồn và cấu hình Flutter cũ đã được loại bỏ.
-
-## Chạy đúng phiên bản
-
-Phiên bản được duy trì và kiểm thử nằm trong module Android `app`, có application ID `com.spacefit.app`.
-
-Để cài đúng bản debug lên thiết bị đang kết nối:
+Android nằm ở `apps/android/`, vẫn là Gradle module `:app`. Mở Android Studio và chạy các lệnh dưới đây từ **gốc repository**. Backend ở `backend/`, image Docker ở `infra/docker/`, báo cáo ở `docs/reports/`; dữ liệu chạy và cache được Git bỏ qua.
 
 ```powershell
+$env:JAVA_HOME = 'C:\Program Files\Java\jdk-25.0.2' # Thay bằng JDK thực sự có trên máy.
+.\gradlew.bat testDebugUnitTest lintDebug assembleDebug
 .\gradlew.bat installDebug
 ```
 
-Sau đó mở ứng dụng **SpaceFit AR** thuộc gói `com.spacefit.app`.
+APK nằm ở `apps/android/build/outputs/apk/debug/app-debug.apk`, package `com.spacefit.app`. Luồng reconstruction không cần Gemini API key. Chỉ luồng nhận diện 5 góc dùng `GEMINI_API_KEY` trong `.env` ở gốc dự án.
 
-## Cấu hình
+Backend có `.env` riêng, không dùng chung file API key Android. Chạy `tools/Start-Backend.ps1`, sau đó ghép nối trong **Quét 3D → biểu tượng laptop**. Hướng dẫn chi tiết và phần cần làm trên điện thoại nằm trong runbook.
 
-Tạo `.env` ở thư mục gốc:
+## Giới hạn cần xác nhận bằng thực nghiệm
 
-```properties
-GEMINI_API_KEY=your_api_key
-```
+Mã triển khai và kiểm thử tự động không thay thế thử quét đồ thật. Kết quả reconstruction phụ thuộc ảnh, nền, ánh sáng và bề mặt. Cần kiểm tra/loại nền, chỉnh hướng, đo scale trước khi dùng GLB để đánh giá độ vừa.
 
-Không commit API key thật. Với sản phẩm phát hành công khai, nên gọi dịch vụ AI qua backend thay vì đặt khóa bí mật trong ứng dụng.
+Room scan hiện hỗ trợ phòng chữ nhật qua ba điểm; cửa và chiều cao nhập tay. AR Preview cần người dùng đặt tâm phòng và chỉnh hướng, chưa tự khớp căn phòng đã scan. Vùng cửa là vùng chữ nhật quy ước, chưa là cung mở cánh cửa hay kiểm tra toàn tuyến đi lại. Gợi ý bố trí là heuristic cục bộ, không phải AI tạo sinh hay nghiệm tối ưu toàn cục.
 
-## Kiểm thử
-
-Mở thư mục gốc bằng Android Studio và chạy cấu hình test của module `app`, hoặc dùng PowerShell:
-
-```powershell
-.\gradlew.bat lintDebug testDebugUnitTest assembleDebug
-```
-
-Bộ kiểm thử bao gồm hình học SpaceFit; đủ năm ảnh trước khi gọi AI; phân tích JSON không tự tạo dữ liệu còn thiếu; kích thước phủ bì và biến đổi mesh; chỉnh/xác nhận số đo trên giao diện; lưu/mở lại tham số; nâng cấp Room từ v2 lên v3 không mất dữ liệu người dùng. Để xuất ảnh giao diện kiểm thử, chạy `./gradlew.bat testDebugUnitTest -Proborazzi.test.record=true`; ảnh trình chỉnh nằm ở `app/build/reports/model-editor*.png`.
-
-Các kiểm thử này không đo độ chính xác nhận diện đồ thật và không thay thế thử camera trên thiết bị. Xem [kịch bản demo và cách đánh giá](docs/BAO_CAO_VA_DEMO.md).
-
-## Giới hạn được công bố
-
-- Kích thước Gemini trả về chỉ là ước lượng tham khảo; người dùng phải xác nhận lại.
-- ML Kit bám theo vật thể nổi bật trong camera; Gemini mới là thành phần xác định loại nội thất sau khi đủ năm hướng.
-- Năm hướng hiện được hướng dẫn theo từng bước, chưa được xác minh bằng pose/IMU. Đánh giá cùng vật thể của Gemini cũng có thể sai; không quảng cáo là tái dựng đa góc chính xác.
-- View camera hiện là lớp nền thử nghiệm cho viewport 3D, chưa phải plane tracking/anchor hoàn chỉnh của ARCore; giao diện vì vậy ghi rõ “3D” hoặc “mô phỏng”.
-- Mô hình là hình học tham số đại diện, chưa có texture lấy từ ảnh, mesh xuất GLB/OBJ hay tái dựng photogrammetry. Tham số không quan sát được dùng mẫu cơ bản và được công bố ngay trong trình chỉnh.
-- SpaceFit hiện dùng bao chữ nhật trục song song trên mặt sàn để kiểm tra va chạm; khi xoay chéo có thể cảnh báo bảo thủ. Khoảng trống đang là khoảng cách tới tường, chưa phải kiểm tra toàn tuyến đi lại, cánh cửa mở hay va chạm mesh 3D chi tiết.
-- Bản demo vẫn gọi Gemini từ Android và cần mạng/API key; trước khi phát hành công khai phải đưa khóa sang backend.
-
-Các giới hạn này là hướng phát triển tiếp theo, không được trình bày như chức năng đã hoàn thiện trong báo cáo.
+Backend dành cho laptop/mạng tin cậy, một worker. Bản debug cho phép HTTP localhost/LAN; release cần HTTPS. Các công cụ native và bộ ảnh quét thật phải sẵn sàng mới xác nhận được cột mốc hoàn chỉnh: **ảnh chiếc ghế thật → GLB đúng chiếc ghế → xem trên điện thoại**.

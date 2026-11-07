@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Verification"
+  short_description: "Regression tests, QA isolation and honest evidence"
+  default_prompt: "Use $spacefit-verification to validate this AR-SpaceFit change and report the evidence."
