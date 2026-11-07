@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Gen3D"
+  short_description: "Photogrammetry, Docker, GLB quality and real scale"
+  default_prompt: "Use $spacefit-gen3d to diagnose and verify this AR-SpaceFit reconstruction issue."

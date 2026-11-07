@@ -1,0 +1,4 @@
+interface:
+  display_name: "Systematic Debugging"
+  short_description: "Root-cause evidence and focused regression fixes"
+  default_prompt: "Use $systematic-debugging to investigate this failure before implementing a focused fix."

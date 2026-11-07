@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit API Design"
+  short_description: "REST contracts, errors, idempotency and compatibility"
+  default_prompt: "Use $api-design to review this API contract and its Android compatibility."

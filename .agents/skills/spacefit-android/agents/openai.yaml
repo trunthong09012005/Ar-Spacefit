@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Android"
+  short_description: "Kotlin, Compose, Room and native GLB workflows"
+  default_prompt: "Use $spacefit-android to implement and verify this AR-SpaceFit Android change."
