@@ -1,8 +1,0 @@
-{
-  "name": "AR SpaceFit",
-  "description": "Ứng dụng Android Kotlin/Jetpack Compose nhận diện nội thất bằng Gemini, mô phỏng bố trí 3D và đánh giá độ phù hợp bằng SpaceFit Engine có thể giải thích.",
-  "platform": "Android",
-  "applicationId": "com.spacefit.app",
-  "requestFramePermissions": ["CAMERA"],
-  "majorCapabilities": ["GEMINI_IMAGE_ANALYSIS", "DETERMINISTIC_SPACEFIT_SCORING", "CAMERAX_PREVIEW"]
-}
