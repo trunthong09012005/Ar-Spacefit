@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Docker Patterns"
+  short_description: "Scoped Docker images, resources and container cleanup"
+  default_prompt: "Use $docker-patterns to review this Docker configuration and its isolation boundaries."

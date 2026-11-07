@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test-Driven Development"
+  short_description: "Meaningful RED-GREEN regression tests for changes"
+  default_prompt: "Use $test-driven-development to establish a regression before implementing this behavior change."

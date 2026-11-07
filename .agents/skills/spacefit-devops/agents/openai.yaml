@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit DevOps"
+  short_description: "Docker, developer environments and scoped CI tooling"
+  default_prompt: "Use $spacefit-devops to diagnose and verify this AR-SpaceFit tooling or CI environment task."

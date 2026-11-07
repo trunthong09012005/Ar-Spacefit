@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Frontend UX"
+  short_description: "Compose UI, accessibility and clear product states"
+  default_prompt: "Use $spacefit-frontend to improve this AR-SpaceFit screen and verify its UI behavior."

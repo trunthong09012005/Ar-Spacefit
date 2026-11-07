@@ -1,5 +1,7 @@
 # Khung báo cáo và kịch bản demo SpaceFit
 
+> Tài liệu lịch sử của phiên bản mô hình tham số. Bản hiện tại xem [BÁO CÁO KỸ THUẬT](BAO_CAO_KY_THUAT.md), [kiến trúc](../ARCHITECTURE.md) và [kịch bản nghiệm thu](../RUNBOOK.md). Các giới hạn AABB/không có ARCore dưới đây chỉ mô tả bản cũ.
+
 ## Tuyên bố đúng phạm vi
 
 Tên đề tài đề xuất: **Xây dựng ứng dụng hỗ trợ bố trí nội thất bằng nhận diện đa góc nhìn và mô hình 3D tham số**.

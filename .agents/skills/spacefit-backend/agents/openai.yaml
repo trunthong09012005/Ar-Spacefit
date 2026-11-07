@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Backend"
+  short_description: "FastAPI contracts, SQLite jobs and worker lifecycle"
+  default_prompt: "Use $spacefit-backend to implement and verify this AR-SpaceFit backend change."

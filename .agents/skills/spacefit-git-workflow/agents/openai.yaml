@@ -1,0 +1,4 @@
+interface:
+  display_name: "AR-SpaceFit Git Workflow"
+  short_description: "Scoped Git changes, conflict resolution and PR prep"
+  default_prompt: "Use $spacefit-git-workflow to inspect and complete this requested Git operation."
