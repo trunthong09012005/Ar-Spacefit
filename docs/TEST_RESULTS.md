@@ -1,5 +1,13 @@
 # Kết quả kiểm thử AR-SpaceFit
 
+## 11/11/2026 — backend CI: rò environment và link log local
+
+- Đọc [PR run](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42359110873) và [push run](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42358964384) của PR #2/commit `b1dbb43`: backend mỗi run **41 failed/353 passed/31 errors**, Android đã SUCCESS. Nguyên nhân đầu: test doctor để lại `SPACEFIT_COLMAP_RUNTIME=docker`, dẫn tới FileNotFoundError cho config riêng máy ở các test phía sau; không phải cần đưa config đó lên GitHub.
+- Regression mới trong `test_import_isolation.py` chạy thật hai ca doctor trong process con, so runtime trước/sau khi bắt đầu absent/native/docker. RED **1 fail/2 pass** (ca absent rò docker), 1 test không thuộc lựa chọn bị deselect; sau sửa `monkeypatch.setenv` để quản lý undo rõ ràng, hai file doctor/import có **9 pass**. Không sửa doctor/config nghiệp vụ hoặc tắt test.
+- Bản source từ Git archive, overlay test đã sửa, không copy `.env`, data, virtualenv hay native config vào checkout: chạy đúng ba ignore native của workflow, môi trường process con loại cấu hình SPACEFIT/native kế thừa. Lượt đầu **427 pass/1 fail** do link `.tools/qa` trong REQUIREMENTS_ACCEPTANCE không được Git quản lý. Sửa tài liệu thành mã run local/plain text, giữ báo cáo lịch sử và link TEST_RESULTS. Lượt cuối **428 pass/0 fail/error/skip**, 50,90 s, hai deprecation warning. JUnit helper đọc report đạt; hash ba file sửa khớp source được kiểm.
+- Evidence `.tools/qa/ci-failure-20261111/`: log remote, environment-leak-repro, red.xml/log, green.xml, docs-green.xml, base archive/clean-checkout, clean-backend.xml/log (FAIL), final-backend.xml/log (PASS), clean-checkout-verification.json. Đây là kiểm backend local tương đương lựa chọn CI trên checkout sạch, chưa phải kết quả Actions ở commit sửa và không nghiệm thu reconstruction/AR.
+- Cổng Test-All theo TESTING dùng JDK 25.0.2, Blender, Offline và RequireBlender/Device/Docker/ColmapDocker; summary `.tools/qa/run-20261111-133952-f5d29c45/`: backend core **424 pass**, HTTP **4 pass**, Blender **4 pass**, Android JVM **117 pass**; build/lint và hai APK thành công. COLMAP **11 fail**, OpenMVS **1 pass/15 fail**; UI chưa chạy do không chọn emulator QA, gate FAIL. Native startup/scan thật/AR chưa nghiệm thu; không đổi lỗi môi trường thành PASS. Report và log được giữ nguyên.
+
 ## 07/11/2026 — CI nền và APK artifact
 
 - Workflow Windows backend/Android và gate tổng hợp; giới hạn CI nền: không chạy Blender, COLMAP/OpenMVS thật hoặc UI/AR trên thiết bị. Ba nhóm native được loại công khai khỏi command backend, không đánh dấu là đã pass. Chưa chạy trên GitHub; cần push nhánh và kiểm run thật. Không triển khai backend/release theo lựa chọn người dùng.

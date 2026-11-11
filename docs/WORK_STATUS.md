@@ -1,6 +1,15 @@
 # Trạng thái công việc
 
-Cập nhật 07/11/2026. Đọc cùng `TEST_RESULTS.md`; trạng thái cũ không thay thế kiểm tra runtime mới.
+Cập nhật 11/11/2026. Đọc cùng `TEST_RESULTS.md`; trạng thái cũ không thay thế kiểm tra runtime mới.
+
+## Sửa backend CI trên checkout sạch — 11/11/2026
+
+- Đã đọc log hai run GitHub của PR #2 tại commit `b1dbb43`: mỗi lượt **41 failed/353 passed/31 errors**, Android thành công, gate lỗi theo backend. Test doctor ghi trực tiếp `SPACEFIT_COLMAP_RUNTIME=docker`, trong khi `monkeypatch.delenv` không ghi undo nếu biến ban đầu không tồn tại. Trạng thái rò sang các test sau, khiến chúng tìm cấu hình laptop không có trên GitHub. Tái hiện được trong process con không đặt runtime, không đọc cấu hình thật.
+- Người dùng cho phép sửa và commit tiếng Anh, chưa push/merge. Sửa test để theo dõi rõ biến override và phục hồi trạng thái ban đầu; thêm ba regression chạy lại test doctor trong process con cho trạng thái absent/native/docker. Giữ nguyên mã backend/Android, workflow, assertion và các nhóm test.
+- RED **1 fail/2 pass/1 deselected**, GREEN hai file liên quan **9 pass**. Bản tracked-source checkout không có `.env`, data hay cấu hình riêng lộ thêm một lỗi tài liệu: hai link ma trận nghiệm thu trỏ QA log bị ignore. Chuyển mã run thành ghi chú local, dẫn tới báo cáo trong Git; giữ số liệu lịch sử và test link.
+- Kiểm lại đúng nhóm backend CI trên checkout sạch sau cả hai sửa: **428 pass/0 fail/error/skip**, gồm ba regression mới. Helper JUnit chấp nhận report thật; hash ba file sửa khớp bản đã kiểm. Evidence `.tools/qa/ci-failure-20261111/` giữ log remote, RED/GREEN, lần sạch đầu **427 pass/1 fail** vì link local, lần sạch cuối và manifest. Chưa có run GitHub ở commit sửa, cần push rồi kiểm lại Actions.
+- PR #2 hiện nhắm `main`; chưa tự đổi base. Theo luồng Gitflow đã thống nhất, nên review đích `develop` trước merge. Không chỉnh PR, phát hành APK, thay cấu hình dịch vụ hoặc thao tác dữ liệu/điện thoại thật trong lượt sửa này.
+- Test-All mới `.tools/qa/run-20261111-133952-f5d29c45/`: core **424 pass**, HTTP **4 pass**, Blender **4 pass**, Android **117 pass**, build/lint/debug APK và instrumentation APK thành công. COLMAP **11 fail**, OpenMVS **1 pass/15 fail**, UI chưa chạy vì không chọn QA emulator; gate ghi FAIL. Native doctor/scan/AR chưa nghiệm thu. Các giới hạn này độc lập với nhóm backend CI sạch đã đạt.
 
 ## CI GitHub Actions và APK tải về — 07/11/2026
 

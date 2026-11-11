@@ -58,10 +58,10 @@ def test_real_cli_missing_tools_exits_nonzero_without_loading_secrets(tmp_path):
 @pytest.mark.parametrize("runtime", [None, "native"])
 def test_doctor_selects_verified_colmap_config_but_honors_explicit_native(monkeypatch, tmp_path, runtime):
     monkeypatch.setattr(doctor, "ROOT", tmp_path)
-    monkeypatch.delenv("SPACEFIT_COLMAP_RUNTIME", raising=False)
+    # Track even an initially absent key: load_config writes os.environ directly,
+    # while delenv(raising=False) cannot undo a key that did not exist before.
+    monkeypatch.setenv("SPACEFIT_COLMAP_RUNTIME", runtime or "")
     monkeypatch.delenv("SPACEFIT_OPENMVS_RUNTIME", raising=False)
-    if runtime:
-        monkeypatch.setenv("SPACEFIT_COLMAP_RUNTIME", runtime)
     # No real .env is read. Existence fixture only; Settings validates its contents separately.
     (tmp_path / "native-colmap-docker.json").write_text("{}", encoding="utf-8")
     doctor.load_config()
