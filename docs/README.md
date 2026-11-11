@@ -7,6 +7,7 @@
 - [Cấu trúc repository và bảng đổi đường dẫn](REPOSITORY_STRUCTURE.md)
 - [Quy trình đóng góp](../CONTRIBUTING.md)
 - [Gitflow và cách chia commit theo nhánh](GITFLOW.md)
+- [CI/CD và bật GitHub Actions](CI_CD.md)
 - [Bộ skill và khi nào bắt buộc dùng](SKILLS.md)
 - [System rules của dự án](../.agents/rules/system-rules.md)
 - [Kiến trúc và dữ liệu](ARCHITECTURE.md)

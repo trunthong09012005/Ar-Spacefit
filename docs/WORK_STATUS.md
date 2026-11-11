@@ -1,6 +1,32 @@
 # Trạng thái công việc
 
-Cập nhật 07/11/2026. Đọc cùng `TEST_RESULTS.md`; trạng thái cũ không thay thế kiểm tra runtime mới.
+Cập nhật 11/11/2026. Đọc cùng `TEST_RESULTS.md`; trạng thái cũ không thay thế kiểm tra runtime mới.
+
+## CI follow-up: tương thích PowerShell runner — 11/11/2026
+
+- PR #2 đã nhận `151fe6e`; [PR run mới](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42975260838) còn **6 failed/422 passed**, Android SUCCESS. Các lỗi env/config trước đã hết. Năm lỗi mới là test tìm nguyên câu validation bị format xuống dòng; một lỗi là `Get-FileHash` không khả dụng trong Windows PowerShell của runner. Không suy diễn lý do module thiếu từ một thông báo cmdlet-not-found.
+- Tiếp tục phạm vi sửa/commit CI đã được người dùng cho phép, chưa push hoặc merge. Test tham số kiểm mã `ParameterArgumentValidationError` và tên tham số thay vì câu văn, giữ kiểm Docker chưa được gọi/config chưa sinh. Hàm checksum dùng stream SHA-256 .NET, resolve đường dẫn bằng API session và xuất chuỗi thuần, không phụ thuộc cmdlet Utility; stream/algorithm luôn dispose.
+- Regression checksum gồm module function không khả dụng, đường dẫn tuyệt đối/tương đối và file thiếu; không giả checksum hoặc tắt assertion. Probe chỉ đổi PSModulePath chưa tái hiện vì PowerShell tự bổ sung path; probe loại function và tắt autoload cho RED **2 fail/3 pass**, sau sửa nhóm runner/setup **40 pass**. APK thật khớp SHA-256 tính độc lập bằng Python.
+- Backend trên source checkout sạch, không có cấu hình runtime local: **432 pass/0 fail/error/skip**; thêm 4 ca so với lượt 428. Chỉ sửa tooling, test và báo cáo, không sửa backend/Android/workflow hoặc cấu hình/dữ liệu thật. Evidence `.tools/qa/ci-followup-20261111/` giữ log remote, các lần probe/RED, intermediate, GREEN, clean JUnit/log, hash nguồn và APK.
+- Cần push commit sửa tiếp theo rồi đọc run GitHub mới; chưa thể coi checks của commit cũ là kết quả bản sửa. Đích PR vẫn main tại thời điểm đọc, chưa tự đổi base.
+- Test-All scoped với `-SkipAndroid` cho thay đổi tooling: core **428 pass**, HTTP **4 pass**, Blender **4 pass**; COLMAP **11 fail**, OpenMVS **1 pass/15 fail**, UI chưa chạy. Gate exit 1, Android được skip rõ ràng vì mã không đổi, không phải full gate PASS. Evidence `.tools/qa/run-20261111-141437-239e7eda/`; checksum APK hiện có được kiểm riêng, không nhận là build Android mới.
+
+## Sửa backend CI trên checkout sạch — 11/11/2026
+
+- Đã đọc log hai run GitHub của PR #2 tại commit `b1dbb43`: mỗi lượt **41 failed/353 passed/31 errors**, Android thành công, gate lỗi theo backend. Test doctor ghi trực tiếp `SPACEFIT_COLMAP_RUNTIME=docker`, trong khi `monkeypatch.delenv` không ghi undo nếu biến ban đầu không tồn tại. Trạng thái rò sang các test sau, khiến chúng tìm cấu hình laptop không có trên GitHub. Tái hiện được trong process con không đặt runtime, không đọc cấu hình thật.
+- Người dùng cho phép sửa và commit tiếng Anh, chưa push/merge. Sửa test để theo dõi rõ biến override và phục hồi trạng thái ban đầu; thêm ba regression chạy lại test doctor trong process con cho trạng thái absent/native/docker. Giữ nguyên mã backend/Android, workflow, assertion và các nhóm test.
+- RED **1 fail/2 pass/1 deselected**, GREEN hai file liên quan **9 pass**. Bản tracked-source checkout không có `.env`, data hay cấu hình riêng lộ thêm một lỗi tài liệu: hai link ma trận nghiệm thu trỏ QA log bị ignore. Chuyển mã run thành ghi chú local, dẫn tới báo cáo trong Git; giữ số liệu lịch sử và test link.
+- Kiểm lại đúng nhóm backend CI trên checkout sạch sau cả hai sửa: **428 pass/0 fail/error/skip**, gồm ba regression mới. Helper JUnit chấp nhận report thật; hash ba file sửa khớp bản đã kiểm. Evidence `.tools/qa/ci-failure-20261111/` giữ log remote, RED/GREEN, lần sạch đầu **427 pass/1 fail** vì link local, lần sạch cuối và manifest. Chưa có run GitHub ở commit sửa, cần push rồi kiểm lại Actions.
+- PR #2 hiện nhắm `main`; chưa tự đổi base. Theo luồng Gitflow đã thống nhất, nên review đích `develop` trước merge. Không chỉnh PR, phát hành APK, thay cấu hình dịch vụ hoặc thao tác dữ liệu/điện thoại thật trong lượt sửa này.
+- Test-All mới `.tools/qa/run-20261111-133952-f5d29c45/`: core **424 pass**, HTTP **4 pass**, Blender **4 pass**, Android **117 pass**, build/lint/debug APK và instrumentation APK thành công. COLMAP **11 fail**, OpenMVS **1 pass/15 fail**, UI chưa chạy vì không chọn QA emulator; gate ghi FAIL. Native doctor/scan/AR chưa nghiệm thu. Các giới hạn này độc lập với nhóm backend CI sạch đã đạt.
+
+## CI GitHub Actions và APK tải về — 07/11/2026
+
+- Theo lựa chọn người dùng, phạm vi hiện tại là kiểm thử/build APK debug để tải, chưa deploy backend hoặc phát hành release. Triển khai trên `feature/ci-pipeline` từ develop, theo quy tắc commit tiếng Anh; chưa push, tạo PR, bật branch protection hoặc có kết quả Actions remote. Hướng dẫn thao tác GitHub và lệnh push nằm trong [CI/CD](CI_CD.md).
+- `.github/workflows/ci.yml`: push nhánh Gitflow/PR vào nhánh tích hợp và workflow_dispatch; Windows backend core/HTTP, Windows Android JVM/lint/build, check tổng hợp `CI gate`. Pin action bằng SHA upstream đã xác minh, token read-only, không dùng secret thật; report/APK artifact giữ 7 ngày. APK dùng debug key runner, chưa phải release ký chính thức.
+- Thêm `tools/Assert-JUnit.ps1` và 8 regression trong `test/backend/test_junit_report.py`: report thiếu/rỗng/lỗi/skip không được tính PASS. RED **1 fail/7 pass** khi chưa có helper, GREEN cùng kiểm tài liệu **31 pass**; actionlint **1.7.12** đạt, YAML/pin/dependency và cú pháp PowerShell đạt. Tool QA được tải riêng và đối chiếu SHA-256 upstream.
+- Gate mới `.tools/qa/run-20261107-160953-04219f70/`: core **421 pass**, HTTP **4 pass**, Blender **4 pass**, Android **117 pass**, build/lint/APK thành công. COLMAP **11 fail**, OpenMVS **1 pass/15 fail**; Docker server probe xác nhận pipe Engine không tồn tại. UI chưa chạy vì không chọn QA emulator. Gate exit 1, native doctor/scan/AR chưa nghiệm thu. CI nền loại ba file native rõ ràng, không thay thế gate đầy đủ hoặc che lỗi môi trường local.
+- Evidence workflow/RED/GREEN/actionlint/probe ở `.tools/qa/ci-20261107/`. Không thay mã ứng dụng/backend, dữ liệu hoặc dịch vụ; không cài app lên điện thoại. Việc tiếp theo: push nhánh CI và develop lên remote, mở PR, đọc lần chạy Actions đầu; chỉ bật required check sau khi xác nhận tên check và quyền repository thực tế.
 
 ## Gitflow và nhập baseline theo thành phần — 07/11/2026
 

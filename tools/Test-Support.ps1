@@ -1,8 +1,20 @@
 # Native output is text, including stderr warnings. Only the exit code determines
 # command failure; PowerShell 5.1 must not promote Java warnings to terminating errors.
 function Write-QAFileHash([string]$Path) {
-    $checksum=Get-FileHash -LiteralPath $Path -Algorithm SHA256
-    Write-Output "SHA256=$($checksum.Hash) path=$($checksum.Path)"
+    # Get-FileHash is an optional module function on Windows PowerShell runners.
+    $resolvedPath=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+    $algorithm=[Security.Cryptography.SHA256]::Create()
+    try {
+        $stream=[IO.File]::OpenRead($resolvedPath)
+        try {
+            $checksum=[BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-', '')
+        } finally {
+            $stream.Dispose()
+        }
+    } finally {
+        $algorithm.Dispose()
+    }
+    "SHA256=$checksum path=$resolvedPath"
 }
 
 function ConvertTo-NativeArguments([string[]]$Values) {

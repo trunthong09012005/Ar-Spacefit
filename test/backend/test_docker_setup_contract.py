@@ -271,7 +271,10 @@ def test_mock_download_uses_fixed_official_release_and_is_verified_before_build(
 def test_invalid_resource_or_context_parameters_fail_before_docker(provisioner_fixture, parameter, invalid_value):
     folder, invoke = provisioner_fixture
     result = invoke(extra_args=("-" + parameter, invalid_value))
-    assert result.returncode != 0 and "Cannot validate argument" in result.stderr
+    # Match the structured validation category, not localized/wrapped prose.
+    assert result.returncode != 0
+    assert "ParameterArgumentValidationError" in result.stderr
+    assert parameter in result.stderr
     assert read_calls(folder) == []
     assert not (folder / "backend/native-docker.json").exists()
 
