@@ -2,6 +2,15 @@
 
 Cập nhật 11/11/2026. Đọc cùng `TEST_RESULTS.md`; trạng thái cũ không thay thế kiểm tra runtime mới.
 
+## CI follow-up: tương thích PowerShell runner — 11/11/2026
+
+- PR #2 đã nhận `151fe6e`; [PR run mới](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42975260838) còn **6 failed/422 passed**, Android SUCCESS. Các lỗi env/config trước đã hết. Năm lỗi mới là test tìm nguyên câu validation bị format xuống dòng; một lỗi là `Get-FileHash` không khả dụng trong Windows PowerShell của runner. Không suy diễn lý do module thiếu từ một thông báo cmdlet-not-found.
+- Tiếp tục phạm vi sửa/commit CI đã được người dùng cho phép, chưa push hoặc merge. Test tham số kiểm mã `ParameterArgumentValidationError` và tên tham số thay vì câu văn, giữ kiểm Docker chưa được gọi/config chưa sinh. Hàm checksum dùng stream SHA-256 .NET, resolve đường dẫn bằng API session và xuất chuỗi thuần, không phụ thuộc cmdlet Utility; stream/algorithm luôn dispose.
+- Regression checksum gồm module function không khả dụng, đường dẫn tuyệt đối/tương đối và file thiếu; không giả checksum hoặc tắt assertion. Probe chỉ đổi PSModulePath chưa tái hiện vì PowerShell tự bổ sung path; probe loại function và tắt autoload cho RED **2 fail/3 pass**, sau sửa nhóm runner/setup **40 pass**. APK thật khớp SHA-256 tính độc lập bằng Python.
+- Backend trên source checkout sạch, không có cấu hình runtime local: **432 pass/0 fail/error/skip**; thêm 4 ca so với lượt 428. Chỉ sửa tooling, test và báo cáo, không sửa backend/Android/workflow hoặc cấu hình/dữ liệu thật. Evidence `.tools/qa/ci-followup-20261111/` giữ log remote, các lần probe/RED, intermediate, GREEN, clean JUnit/log, hash nguồn và APK.
+- Cần push commit sửa tiếp theo rồi đọc run GitHub mới; chưa thể coi checks của commit cũ là kết quả bản sửa. Đích PR vẫn main tại thời điểm đọc, chưa tự đổi base.
+- Test-All scoped với `-SkipAndroid` cho thay đổi tooling: core **428 pass**, HTTP **4 pass**, Blender **4 pass**; COLMAP **11 fail**, OpenMVS **1 pass/15 fail**, UI chưa chạy. Gate exit 1, Android được skip rõ ràng vì mã không đổi, không phải full gate PASS. Evidence `.tools/qa/run-20261111-141437-239e7eda/`; checksum APK hiện có được kiểm riêng, không nhận là build Android mới.
+
 ## Sửa backend CI trên checkout sạch — 11/11/2026
 
 - Đã đọc log hai run GitHub của PR #2 tại commit `b1dbb43`: mỗi lượt **41 failed/353 passed/31 errors**, Android thành công, gate lỗi theo backend. Test doctor ghi trực tiếp `SPACEFIT_COLMAP_RUNTIME=docker`, trong khi `monkeypatch.delenv` không ghi undo nếu biến ban đầu không tồn tại. Trạng thái rò sang các test sau, khiến chúng tìm cấu hình laptop không có trên GitHub. Tái hiện được trong process con không đặt runtime, không đọc cấu hình thật.

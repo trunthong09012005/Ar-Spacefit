@@ -11,10 +11,10 @@ pytestmark = pytest.mark.skipif(os.name != "nt", reason="PowerShell Windows test
 SUPPORT = Path(__file__).resolve().parents[2] / "tools" / "Test-Support.ps1"
 
 
-def run_ps(statement):
+def run_ps(statement, env=None):
     return subprocess.run(["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
         "$ErrorActionPreference='Stop'; . '" + str(SUPPORT).replace("'", "''") + "'; " + statement],
-        capture_output=True, text=True, timeout=20)
+        capture_output=True, text=True, timeout=20, env=env)
 
 
 def command(code, args=()):
@@ -43,15 +43,34 @@ def test_windows_argument_quoting_roundtrips_spaces_quotes_and_slashes():
     assert json.loads(result.stdout) == args
 
 
-def test_artifact_checksum_is_plain_text_for_logs(tmp_path):
+@pytest.mark.parametrize("restricted_modules", [False, True])
+@pytest.mark.parametrize("relative_path", [False, True])
+def test_artifact_checksum_is_plain_text_for_logs(tmp_path, restricted_modules, relative_path):
     artifact = tmp_path / "QA checksum fixture.apk"
     contents = b"checksum fixture, not an Android application"
     artifact.write_bytes(contents)
-    result = run_ps("Write-QAFileHash '" + str(artifact).replace("'", "''") + "'")
+    env = dict(os.environ)
+    if restricted_modules:
+        module_path = tmp_path / "empty-modules"
+        module_path.mkdir()
+        env["PSModulePath"] = str(module_path)
+    argument = artifact.name if relative_path else str(artifact)
+    statement = "Set-Location '" + str(tmp_path).replace("'", "''") + "'; " if relative_path else ""
+    if restricted_modules:
+        # Reproduce a runner where the optional hashing function is unavailable;
+        # Windows PowerShell may otherwise append its default module paths.
+        statement += "Remove-Item Function:\\Get-FileHash -ErrorAction SilentlyContinue; $PSModuleAutoLoadingPreference='None'; "
+    result = run_ps(statement + "Write-QAFileHash '" + argument.replace("'", "''") + "'", env=env)
     assert result.returncode == 0, result.stderr
     assert "SHA256=" + hashlib.sha256(contents).hexdigest().upper() in result.stdout
     assert str(artifact) in result.stdout
     assert "FormatStartData" not in result.stdout
+
+
+def test_missing_artifact_never_emits_checksum(tmp_path):
+    result = run_ps("Write-QAFileHash '" + str(tmp_path / "missing.apk").replace("'", "''") + "'")
+    assert result.returncode != 0
+    assert "SHA256=" not in result.stdout
 
 
 def test_gate_records_failures_and_skips_and_returns_nonzero(tmp_path):

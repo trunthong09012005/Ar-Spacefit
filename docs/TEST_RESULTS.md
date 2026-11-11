@@ -1,5 +1,13 @@
 # Kết quả kiểm thử AR-SpaceFit
 
+## 11/11/2026 — CI follow-up ở commit 151fe6e
+
+- [Backend PR job](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42975260838/job/130372756468) tại `151fe6e`: **6 failed/422 passed**, không còn nhóm lỗi đọc native config do rò env. Năm ca invalid resource/context thực tế đã từ chối tham số nhưng assertion câu tiếng Anh không chịu format xuống dòng. Checksum test lỗi `Get-FileHash` cmdlet/function unavailable. Android ở cùng run đã SUCCESS; đó là bằng chứng remote của commit cũ.
+- Đổi kiểm tra validation sang mã lỗi và tên tham số; vẫn assert nonzero, Docker chưa được gọi, chưa có config. SHA-256 dùng .NET streaming thay Get-FileHash, giữ format checksum/path plain text và fail khi file không có. Không thay workflow, giới hạn native hoặc API ứng dụng.
+- Regression: giới hạn PSModulePath đơn thuần cho **5 pass**, chưa tái hiện vì Windows PowerShell bổ sung đường dẫn mặc định. Loại function/tắt autoload trong process con cho RED **2 fail/3 pass**; bản sửa trung gian **2 fail/38 pass** vì Write-Output cũng cần module; dùng expression chuỗi thuần rồi GREEN **40 pass/0 fail/error/skip**, 20,26 s. Giữ red.xml, red-unavailable.xml, intermediate.xml và green.xml, không xóa lượt FAIL.
+- Checkout từ Git archive, overlay ba file đã sửa, không có env/data/native config local: đúng nhóm backend của CI **432 pass/0 fail/error/skip**, 45,99 s; hai deprecation warning. Evidence `.tools/qa/ci-followup-20261111/clean.xml`, clean.log và tested-source-hashes.json. APK checksum từ helper khớp Python hashlib độc lập, lưu apk-hash-verification.txt. Đây là kiểm local; chưa có Actions run cho commit sửa mới.
+- `tools/Test-All.ps1 -SkipAndroid -BlenderBin D:\Blender\blender.exe -RequireBlender -RequireDevice -RequireDocker -RequireColmapDocker`: core **428 pass**, HTTP **4 pass**, Blender **4 pass**, COLMAP **11 fail**, OpenMVS **1 pass/15 fail**, UI chưa chạy, Android build/JVM **SKIP có chủ đích** vì không thay mã Android. Scoped gate exit 1, không tính skip thành pass hoặc nhận là full gate. Evidence `.tools/qa/run-20261111-141437-239e7eda/` và ci-followup gate.log. Native doctor/scan/AR chưa nghiệm thu.
+
 ## 11/11/2026 — backend CI: rò environment và link log local
 
 - Đọc [PR run](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42359110873) và [push run](https://github.com/trunthong09012005/Ar-Spacefit/actions/runs/42358964384) của PR #2/commit `b1dbb43`: backend mỗi run **41 failed/353 passed/31 errors**, Android đã SUCCESS. Nguyên nhân đầu: test doctor để lại `SPACEFIT_COLMAP_RUNTIME=docker`, dẫn tới FileNotFoundError cho config riêng máy ở các test phía sau; không phải cần đưa config đó lên GitHub.
